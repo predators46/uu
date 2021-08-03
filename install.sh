@@ -1,12 +1,15 @@
 #!/bin/bash
+
 # Libernet Installer
 # by Lutfa Ilham
 # v1.0
+
 if [ "$(id -u)" != "0" ]; then
   echo "This script must be run as root" 1>&2
   exit 1
 fi
 
+HOME="/root"
 ARCH="$(grep 'DISTRIB_ARCH' /etc/openwrt_release | awk -F '=' '{print $2}' | sed "s/'//g")"
 LIBERNET_DIR="${HOME}/libernet"
 LIBERNET_WWW="/www/libernet"
@@ -77,7 +80,7 @@ function enable_uhttp_php() {
 function add_libernet_environment() {
   if ! grep -q LIBERNET_DIR /etc/profile; then
     echo -e "Adding Libernet environment" \
-      && echo -e "# Libernet\nexport LIBERNET_DIR=${LIBERNET_DIR}" | tee -a '/etc/profile'
+      && echo -e "\n# Libernet\nexport LIBERNET_DIR=${LIBERNET_DIR}" | tee -a '/etc/profile'
   fi
 }
 
@@ -107,10 +110,51 @@ function install_libernet() {
     && sed -i "s/LIBERNET_DIR/$(echo ${LIBERNET_DIR} | sed 's/\//\\\//g')/g" "${LIBERNET_WWW}/config.inc.php"
 }
 
+#function configure_libernet_firewall() {
+  #if ! uci get network.libernet > /dev/null 2>&1; then
+    #echo "Configuring Libernet firewall" \
+      #&& uci set network.libernet=interface \
+      #&& uci set network.libernet.proto='none' \
+      #&& uci set network.libernet.ifname='tun1' \
+      #&& uci commit \
+      #&& uci add firewall zone \
+      #&& uci set firewall.@zone[-1].network='libernet' \
+      #&& uci set firewall.@zone[-1].name='libernet' \
+      #&& uci set firewall.@zone[-1].masq='1' \
+      #&& uci set firewall.@zone[-1].mtu_fix='1' \
+      #&& uci set firewall.@zone[-1].input='REJECT' \
+      #&& uci set firewall.@zone[-1].forward='REJECT' \
+      #&& uci set firewall.@zone[-1].output='ACCEPT' \
+      #&& uci commit \
+      #&& uci add firewall forwarding \
+      #&& uci set firewall.@forwarding[-1].src='lan' \
+      #&& uci set firewall.@forwarding[-1].dest='libernet' \
+      #&& uci commit \
+      #&& /etc/init.d/network restart
+  #fi
+#}
+
 function configure_libernet_service() {
   echo -e "Configuring Libernet service"
-  # disable dns resolver startup
-  /etc/init.d/https-dns-proxy disable
+  # disable services startup
+  # DoT
+  /etc/init.d/stubby disable
+  # shadowsocks
+  /etc/init.d/shadowsocks-libev disable
+  # openvpn
+  /etc/init.d/openvpn disable
+  # stunnel
+  /etc/init.d/stunnel disable
+}
+
+function setup_system_logs() {
+  echo -e "Setup system logs"
+  logs=("status.log" "service.log" "connected.log")
+  for log in "${logs[@]}"; do
+    if [[ ! -f "${LIBERNET_DIR}/log/${log}" ]]; then
+      touch "${LIBERNET_DIR}/log/${log}"
+    fi
+  done
 }
 
 function finish_install() {
@@ -123,7 +167,9 @@ function main_installer() {
     && install_libernet \
     && add_libernet_environment \
     && enable_uhttp_php \
+    #&& configure_libernet_firewall \
     && configure_libernet_service \
+    && setup_system_logs \
     && finish_install
 }
 
