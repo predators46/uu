@@ -1,21 +1,19 @@
 #!/bin/bash
-
 # Libernet Installer
 # by Lutfa Ilham
 # v1.0
-
 if [ "$(id -u)" != "0" ]; then
   echo "This script must be run as root" 1>&2
   exit 1
 fi
 
-#ARCH="$(grep 'DISTRIB_ARCH' /etc/openwrt_release | awk -F '=' '{print $2}' | sed "s/'//g")"
+ARCH="$(grep 'DISTRIB_ARCH' /etc/openwrt_release | awk -F '=' '{print $2}' | sed "s/'//g")"
 LIBERNET_DIR="${HOME}/libernet"
 LIBERNET_WWW="/www/libernet"
 STATUS_LOG="${LIBERNET_DIR}/log/status.log"
 DOWNLOADS_DIR="${HOME}/Downloads"
 LIBERNET_TMP="${DOWNLOADS_DIR}/libernet"
-REPOSITORY_URL="https://github.com/predators46/uu.git"
+REPOSITORY_URL="git://github.com/predators46/uu.git"
 
 function install_packages() {
   while IFS= read -r line; do
