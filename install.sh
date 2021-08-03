@@ -15,7 +15,7 @@ LIBERNET_WWW="/www/libernet"
 STATUS_LOG="${LIBERNET_DIR}/log/status.log"
 DOWNLOADS_DIR="${HOME}/Downloads"
 LIBERNET_TMP="${DOWNLOADS_DIR}/libernet"
-REPOSITORY_URL="git@github.com:predators46/uu.git"
+REPOSITORY_URL="https://github.com/predators46/uu.git"
 
 function install_packages() {
   while IFS= read -r line; do
