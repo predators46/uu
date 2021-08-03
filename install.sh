@@ -9,13 +9,13 @@ if [ "$(id -u)" != "0" ]; then
   exit 1
 fi
 
-ARCH="$(grep 'DISTRIB_ARCH' /etc/openwrt_release | awk -F '=' '{print $2}' | sed "s/'//g")"
+#ARCH="$(grep 'DISTRIB_ARCH' /etc/openwrt_release | awk -F '=' '{print $2}' | sed "s/'//g")"
 LIBERNET_DIR="${HOME}/libernet"
 LIBERNET_WWW="/www/libernet"
 STATUS_LOG="${LIBERNET_DIR}/log/status.log"
 DOWNLOADS_DIR="${HOME}/Downloads"
 LIBERNET_TMP="${DOWNLOADS_DIR}/libernet"
-REPOSITORY_URL="git://github.com/lutfailham96/libernet.git"
+REPOSITORY_URL="git@github.com:predators46/uu.git"
 
 function install_packages() {
   while IFS= read -r line; do
@@ -32,8 +32,8 @@ function install_proprietary_binaries() {
     if ! which ${line} > /dev/null 2>&1; then
       bin="/usr/bin/${line}"
       echo "Installing ${line} ..."
-      curl -sLko "${bin}" "https://github.com/lutfailham96/libernet-proprietary/raw/main/${ARCH}/binaries/${line}"
-      chmod +x "${bin}"
+      #curl -sLko "${bin}" "https://github.com/lutfailham96/libernet-proprietary/raw/main/${ARCH}/binaries/${line}"
+      #chmod +x "${bin}"
     fi
   done < binaries.txt
 }
@@ -44,8 +44,8 @@ function install_proprietary_packages() {
     if ! which ${line} > /dev/null 2>&1; then
       pkg="/tmp/${line}.ipk"
       echo "Installing ${line} ..."
-      curl -sLko "${pkg}" "https://github.com/lutfailham96/libernet-proprietary/raw/main/${ARCH}/packages/${line}.ipk"
-      opkg install "${pkg}"
+      #curl -sLko "${pkg}" "https://github.com/lutfailham96/libernet-proprietary/raw/main/${ARCH}/packages/${line}.ipk"
+      #opkg install "${pkg}"
       rm -rf "${pkg}"
     fi
   done < packages.txt
